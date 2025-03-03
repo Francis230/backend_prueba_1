@@ -21,6 +21,9 @@ app.use(cors())
 app.use(express.json())
 
 // Rutas 
+app.get('/', (req, res) => {
+    res.send('Bienvenido a la Gestion de matriulas de la Unidad Educativa del Milenio')
+})
 app.use('/api',routersUsuario)
 app.use('/api/materia',routersMateria)
 app.use('/api/estudiante',routersEstudiante)
