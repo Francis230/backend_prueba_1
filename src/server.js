@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 import cors from 'cors';
 
 // Rutas especificas de cada modelo del backend 
-import routersUsuario from "./routers/useroutes.js"
+import routersUsuario from "./routers/useRoutes.js"
 import routersMateria from "./routers/materiaRouters.js"
 import routersEstudiante from "./routers/estudianteRouters.js"
 import routersMatricula from './routers/matriculaRouters.js'
