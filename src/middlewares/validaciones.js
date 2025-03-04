@@ -68,6 +68,8 @@ const validacionMateria = [
 
     check("descripcion")
         .isLength({ min: 10, max: 100 }).withMessage('La "descripción" debe tener entre 10 y 100 caracteres'),
+    check("creditos")
+        .isInt({ min: 1, max: 10 }).withMessage('Los "créditos" deben ser un número entero entre 1 y 10'),    
 
     (req, res, next) => {
         const errors = validationResult(req);

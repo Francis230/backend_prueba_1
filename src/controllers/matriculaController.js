@@ -64,7 +64,7 @@ const registrarMatricula = async (req, res) => {
 const obtenerMatricula = async (req, res) => {
     const { id } = req.params;
 
-    const matricula = await Matricula.findById(id).populate('estudiante', 'nombre apellido').populate('materia', 'descripcion');
+    const matricula = await Matricula.findById(id).select('codigo descripcion').populate('estudiante', 'nombre apellido').populate('materia', 'descripcion');
     if (!matricula) return res.status(404).json({ msg: "Matrícula no encontrada" });
 
     res.status(200).json(matricula);
