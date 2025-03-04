@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 // Obtener todas las materias
 const listarMaterias = async (req, res) => {
     const materias = await Materia.find({ estado: true }).select('-createdAt -updatedAt -__v');
-    res.status(200).json({ msg: `Bienvenido - ${req.usuario.nombre}`, materias });
+    res.status(200).json({ msg: `Bienvenido - ${req.usuario.nombre} al módulo de Materias`, materias });
 };
 
 // Obtener el detalle de una materia por ID
@@ -14,7 +14,7 @@ const detalleMateria = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) 
         return res.status(404).json({ msg: `No existe la materia con ID: ${id}` });
 
-    const materia = await Materia.findById(id).select('-createdAt -updatedAt -__v');
+    const materia = await Materia.findById(id).select('-createdAt -updatedAt -__v status');
 
     if (!materia) return res.status(404).json({ msg: "Materia no encontrada" });
 
@@ -76,7 +76,7 @@ const eliminarMateria = async (req, res) => {
     }
 
     // Buscar y eliminar la materia
-    const materiaEliminada = await Materia.findByIdAndDelete(id);
+    const materiaEliminada = await Materia.findByIdAndUpdate(id, { status: false}, {new: true});
 
     // Si no se encuentra la materia, enviar error
     if (!materiaEliminada) {
@@ -84,7 +84,7 @@ const eliminarMateria = async (req, res) => {
     }
 
     // Responder con mensaje de éxito
-    res.status(200).json({ msg: "Materia eliminada permanentemente" });
+    res.status(200).json({ msg: "Materia eliminada correctamente" });
 };
 
 

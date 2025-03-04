@@ -13,6 +13,22 @@ const validacionEstudiante = [
     check("cedula")
         .isLength({ min: 10, max: 10 }).withMessage('La "cédula" debe tener 10 dígitos')
         .isNumeric().withMessage('La "cédula" solo puede contener números'),
+        
+    check("fecha_nacimiento")
+    .isISO8601().withMessage('La "fecha de nacimiento" debe tener el formato YYYY-MM-DD')
+    .custom(value => {
+        const fecha = new Date(value);
+        const hoy = new Date();
+        const edad = hoy.getFullYear() - fecha.getFullYear();
+
+        if (fecha > hoy) {
+            throw new Error('La "fecha de nacimiento" no puede ser en el futuro');
+        }
+        if (edad < 10 || edad > 100) {
+            throw new Error('La edad debe estar entre 10 y 100 años');
+        }
+        return true;
+    }),
 
     check("email")
         .isEmail().withMessage('El "email" no es válido')

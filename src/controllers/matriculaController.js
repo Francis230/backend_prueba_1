@@ -6,15 +6,34 @@ import Materia from '../models/Materias.js';
 // Obtener todas las matrículas
 const listarMatriculas = async (req, res) => {
     try {
+        // Obtener las matrículas con filtros de estudiantes y materias activos
         const matriculas = await Matricula.find()
-            .populate('estudiante', 'nombre apellido')  // Muestra solo nombre y apellido del estudiante
-            .populate('materia', 'descripcion');       // Muestra solo la descripción de la materia
+            .populate({
+                path: 'estudiante',
+                match: { status: true },  // Filtrar solo estudiantes activos
+                select: 'nombre apellido' // Muestra solo nombre y apellido del estudiante
+            })
+            .populate({
+                path: 'materia',
+                match: { status: true },  // Filtrar solo materias activas
+                select: 'descripcion' // Muestra solo la descripción de la materia
+            });
 
+        // Filtrar las matrículas donde tanto el estudiante como la materia están activos
+        const matriculasActivas = matriculas.filter(m => m.estudiante && m.materia);
+
+        // Si no se encuentran matrículas activas
+        if (matriculasActivas.length === 0) {
+            return res.status(404).json({ msg: "No se encontraron matrículas activas" });
+        }
+
+        // Respuesta con un mensaje personalizado y las matrículas filtradas
         res.status(200).json({ 
-            msg: `Bienvenido - ${req.usuario.nombre} al modulo de Matrículas `, 
-            matriculas 
+            msg: `Bienvenido - ${req.usuario.nombre} al módulo de Matrículas`, 
+            matriculas: matriculasActivas 
         });
     } catch (error) {
+        // Manejo de errores
         res.status(500).json({ msg: "Error al obtener las matrículas", error });
     }
 };
@@ -28,15 +47,16 @@ const registrarMatricula = async (req, res) => {
     }
 
     const estudianteExiste = await Estudiante.findById(estudiante);
-    if (!estudianteExiste) return res.status(404).json({ msg: "Estudiante no encontrado" });
+    if (!estudianteExiste || estudianteExiste.estado === false ) return res.status(404).json({ msg: "Estudiante eliminado o no encontrado" });
 
     const materiaExiste = await Materia.findById(materia);
-    if (!materiaExiste) return res.status(404).json({ msg: "Materia no encontrada" });
+    if (!materiaExiste || materiaExiste.estado === false ) return res.status(404).json({ msg: "Materia eliminada o no encontrada" });
+
 
     const nuevaMatricula = new Matricula({ estudiante, materia, codigo, descripcion});
     await nuevaMatricula.save();
 
-    res.status(201).json({ msg: "Matrícula registrada con éxito" });
+    res.status(201).json({ msg: "Matrícula registrada con éxito" , mmatricula : nuevaMatricula });
 };
 
 // Obtener una matrícula por ID
@@ -95,10 +115,14 @@ const actualizarMatricula = async (req, res) => {
 const eliminarMatricula = async (req, res) => {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ msg: "ID inválido" });
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ msg: `No existe la matrícula con ID: ${id}`  });
 
-    await Matricula.findByIdAndDelete(id);
+    await Matricula.findByIdAndDelete(id,{status: false },{ new: true});
 
+    if (!matriculaEliminada) {
+        return res.status(404).json({ msg: "Matrícula no encontrada" });
+    }
+    
     res.status(200).json({ msg: "Matrícula eliminada correctamente" });
 };
 

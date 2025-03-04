@@ -23,14 +23,14 @@ const registrarEstudiante = async (req, res) => {
     const nuevoEstudiante = new Estudiante({ nombre, apellido, email , cedula , fecha_nacimiento, telefono , ciudad, direccion });
     await nuevoEstudiante.save();
 
-    res.status(201).json({ msg: "Estudiante registrado con éxito" });
+    res.status(201).json({ msg: "Estudiante registrado con éxito" , estudiante : nuevoEstudiante});
 };
 
 // Obtener un estudiante por ID
 const obtenerEstudiante = async (req, res) => {
     const { id } = req.params;
 
-    const estudiante = await Estudiante.findById(id);
+    const estudiante = await Estudiante.findById(id).select('-createdAt -updatedAt -__v status');
     if (!estudiante) return res.status(404).json({ msg: "Estudiante no encontrado" });
 
     res.status(200).json(estudiante);
@@ -68,7 +68,7 @@ const eliminarEstudiante = async (req, res) => {
         return res.status(404).json({ msg: `No existe el estudiante con ID: ${id}` });
     }
     // Buscar y eliminar al estudiante
-    const estuEliminada = await Estudiante.findByIdAndDelete(id);
+    const estuEliminada = await Estudiante.findByIdAndUpdate(id, { status: false}, {new: true} );
     // Si no se encuentra la materia, enviar error
     if (!estuEliminada) {
         return res.status(404).json({ msg: "Estudiante no encontrado" });
