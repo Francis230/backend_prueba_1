@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 // Obtener todos los estudiantes
 const listarEstudiantes = async (req, res) => {
-    const estudiantes = await Estudiante.find({status: true }).select('-createdAt -updatedAt -__v');
+    const estudiantes = await Estudiante.find({status: true }).select('nombre apellido email cedula fecha_nacimiento telefono ciudad direccion');
     res.status(200).json({msg: `Bienvenido - ${req.usuario.nombre} al modulo de Estudiantes `, estudiantes} );
 };
 
@@ -30,7 +30,7 @@ const registrarEstudiante = async (req, res) => {
 const obtenerEstudiante = async (req, res) => {
     const { id } = req.params;
 
-    const estudiante = await Estudiante.findById(id).select('-createdAt -updatedAt -__v status');
+    const estudiante = await Estudiante.findById(id).select('nombre apellido email cedula fecha_nacimiento telefono ciudad direccion');
     if (!estudiante) return res.status(404).json({ msg: "Estudiante no encontrado" });
 
     res.status(200).json(estudiante);

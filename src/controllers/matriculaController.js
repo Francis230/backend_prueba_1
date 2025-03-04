@@ -18,7 +18,7 @@ const listarMatriculas = async (req, res) => {
                 match: { status: true },  // Filtrar solo materias activas
                 select: 'descripcion' // Muestra solo la descripción de la materia
             })
-            .select('-createdAt -updatedAt -__v');  // Excluir los campos createdAt, updatedAt, y __v
+            .select('codigo descripcion');  // Excluir los campos createdAt, updatedAt, y __v
 
         // Filtrar las matrículas donde tanto el estudiante como la materia están activos
         const matriculasActivas = matriculas.filter(m => m.estudiante && m.materia);

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 // Obtener todas las materias
 const listarMaterias = async (req, res) => {
-    const materias = await Materia.find({ estado: true }).select('-createdAt -updatedAt -__v');
+    const materias = await Materia.find({ status: true }).select('nombre descripcion codigo creditos');
     res.status(200).json({ msg: `Bienvenido - ${req.usuario.nombre} al módulo de Materias`, materias });
 };
 
@@ -11,14 +11,22 @@ const listarMaterias = async (req, res) => {
 const detalleMateria = async (req, res) => {
     const { id } = req.params;
     
+    // Verificar si el ID es válido
     if (!mongoose.Types.ObjectId.isValid(id)) 
         return res.status(404).json({ msg: `No existe la materia con ID: ${id}` });
 
-    const materia = await Materia.findById(id).select('-createdAt -updatedAt -__v status');
+    try {
+        // Obtener la materia solo con los campos necesarios
+        const materia = await Materia.findById(id).select('nombre descripcion codigo creditos');  // Seleccionar solo los campos relevantes
 
-    if (!materia) return res.status(404).json({ msg: "Materia no encontrada" });
+        if (!materia) return res.status(404).json({ msg: "Materia no encontrada" });
 
-    res.status(200).json(materia);
+        // Enviar la respuesta con la materia obtenida
+        res.status(200).json(materia);
+    } catch (error) {
+        // Manejo de errores
+        res.status(500).json({ msg: "Error al obtener la materia", error });
+    }
 };
 
 // Registrar una nueva materia
