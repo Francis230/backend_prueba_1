@@ -17,7 +17,8 @@ const listarMatriculas = async (req, res) => {
                 path: 'materia',
                 match: { status: true },  // Filtrar solo materias activas
                 select: 'descripcion' // Muestra solo la descripción de la materia
-            });
+            })
+            .select('-createdAt -updatedAt -__v');  // Excluir los campos createdAt, updatedAt, y __v
 
         // Filtrar las matrículas donde tanto el estudiante como la materia están activos
         const matriculasActivas = matriculas.filter(m => m.estudiante && m.materia);
@@ -122,7 +123,7 @@ const eliminarMatricula = async (req, res) => {
     if (!matriculaEliminada) {
         return res.status(404).json({ msg: "Matrícula no encontrada" });
     }
-    
+
     res.status(200).json({ msg: "Matrícula eliminada correctamente" });
 };
 
